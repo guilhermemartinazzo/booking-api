@@ -37,4 +37,8 @@ public class UserService {
 	public User findUserById(Long id) {
 		return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
 	}
+
+	public UserResponseDTO findUserDTOById(Long id) {
+		return buildUserResponseDTO(findUserById(id));
+	}
 }

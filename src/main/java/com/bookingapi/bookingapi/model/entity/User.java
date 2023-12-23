@@ -3,7 +3,6 @@ package com.bookingapi.bookingapi.model.entity;
 import java.util.List;
 
 import com.bookingapi.bookingapi.enumerator.UserType;
-import com.bookingapi.bookingapi.model.dto.requestbody.UserDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,26 +33,20 @@ public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@Column
 	private String email;
-	
+
 	@Column
 	@Enumerated(EnumType.STRING)
 	private UserType userType;
-	
+
 	@OneToMany(mappedBy = "manager")
 	private List<Property> managedProperties;
-	
+
 	@OneToMany(mappedBy = "owner")
 	private List<Property> ownedProperties;
-	
-	public User(UserDTO userDTO) {
-		this.email = userDTO.email();
-		this.userType = userDTO.userType();
-		this.id = userDTO.id();
-	}
-	
+
 	public User(Long id) {
 		this.id = id;
 	}

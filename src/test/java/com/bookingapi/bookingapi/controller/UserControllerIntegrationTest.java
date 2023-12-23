@@ -26,7 +26,7 @@ class UserControllerIntegrationTest extends TestController {
 	@DisplayName("Create a user of type GUEST - Success")
 	void createUserTest() throws Exception {
 		// Preparing
-		UserDTO user = new UserDTO(null, "userguest@test.com", UserType.GUEST);
+		UserDTO user = new UserDTO("userguest@test.com", UserType.GUEST);
 		// Executing
 		MvcResult result = mockMvc.perform(post("/v1/user").contentType(MediaType.APPLICATION_JSON_VALUE)
 				.content(objMapper.writeValueAsString(user))).andExpect(status().isCreated()).andReturn();

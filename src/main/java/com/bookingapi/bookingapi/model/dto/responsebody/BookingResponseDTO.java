@@ -7,15 +7,18 @@ import com.bookingapi.bookingapi.group.UpdateGroup;
 import com.bookingapi.bookingapi.util.BookingApiUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record BookingResponseDTO(@NotNull(groups = {
 		UpdateGroup.class }) Long id, String propertyDescription, String emailGuest,
 		@JsonFormat(shape = Shape.STRING, pattern = BookingApiUtils.DATE_FORMAT) LocalDate startDate,
 		@JsonFormat(shape = Shape.STRING, pattern = BookingApiUtils.DATE_FORMAT) LocalDate endDate,
-		BookingStatus status){
+		BookingStatus status, String details){
 
 }

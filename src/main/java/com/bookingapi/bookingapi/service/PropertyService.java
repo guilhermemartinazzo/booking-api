@@ -23,7 +23,6 @@ public class PropertyService {
 	private final UserService userService;
 
 	public PropertyResponseDTO create(PropertyDTO propertyDTO) {
-		propertyDTO.description();
 		User manager = userService.findUserById(propertyDTO.managerId());
 		User owner = userService.findUserById(propertyDTO.ownerId());
 		Property prop = new Property();
