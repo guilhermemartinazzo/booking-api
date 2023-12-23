@@ -21,7 +21,6 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.bookingapi.bookingapi.enumerator.BookingStatus;
 import com.bookingapi.bookingapi.model.dto.requestbody.BlockDTO;
-import com.bookingapi.bookingapi.model.dto.requestbody.BookingDTO;
 import com.bookingapi.bookingapi.model.dto.requestbody.CreateBookingDTO;
 import com.bookingapi.bookingapi.model.dto.responsebody.BookingResponseDTO;
 import com.bookingapi.bookingapi.model.dto.responsebody.ExceptionResponseDTO;
@@ -127,7 +126,7 @@ class BookingControllerIntegrationTest extends TestController {
 	void testUserGuestCreateBooking_Status_OK() throws Exception {
 
 		// Preparing
-		BookingDTO bookingPayload = BookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
 				.endDate(LocalDate.of(2099, 12, 9)).userId(ID_USER_GUEST).build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating
@@ -147,7 +146,7 @@ class BookingControllerIntegrationTest extends TestController {
 	void testUserManagerCreateBooking_Status_BAD_REQUEST() throws Exception {
 
 		// Preparing
-		BookingDTO bookingPayload = BookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
 				.endDate(LocalDate.of(2099, 12, 9)).userId(ID_USER_MANAGER).build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating
@@ -161,7 +160,7 @@ class BookingControllerIntegrationTest extends TestController {
 	void testUserOwnerCreateBooking_Status_BAD_REQUEST() throws Exception {
 
 		// Preparing
-		BookingDTO bookingPayload = BookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
 				.endDate(LocalDate.of(2099, 12, 9)).userId(ID_USER_OWNER).build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating
@@ -175,7 +174,7 @@ class BookingControllerIntegrationTest extends TestController {
 	void testUserGuestCreateBooking_Status_BAD_REQUEST() throws Exception {
 
 		// Preparing
-		BookingDTO bookingPayload = BookingDTO.builder().propertyId(ID_PROPERTY_2)
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().propertyId(ID_PROPERTY_2)
 				.startDate(LocalDate.now().minusDays(1)).endDate(LocalDate.now()).userId(ID_USER_GUEST).build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating
@@ -189,7 +188,7 @@ class BookingControllerIntegrationTest extends TestController {
 	void testUserGuestCreateBookingNoRequiredFields_Status_BAD_REQUEST() throws Exception {
 
 		// Preparing
-		BookingDTO bookingPayload = BookingDTO.builder().build();
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating
 		MvcResult result = mockMvc
@@ -211,8 +210,8 @@ class BookingControllerIntegrationTest extends TestController {
 		BookingResponseDTO bookingCreatedProperty2 = bookingService
 				.createBooking(CreateBookingDTO.builder().startDate(LocalDate.of(2098, 10, 01))
 						.endDate(LocalDate.of(2098, 10, 02)).propertyId(ID_PROPERTY_2).userId(ID_USER_GUEST).build());
-		BookingDTO bookingPayload = BookingDTO.builder().startDate(LocalDate.of(2098, 12, 01))
-				.endDate(LocalDate.of(2098, 12, 02)).propertyId(ID_PROPERTY_2).status(BookingStatus.ACTIVE)
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().startDate(LocalDate.of(2098, 12, 01))
+				.endDate(LocalDate.of(2098, 12, 02)).propertyId(ID_PROPERTY_2)
 				.userId(ID_USER_GUEST).build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating

@@ -16,7 +16,7 @@ import lombok.Builder;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record BookingResponseDTO(@NotNull(groups = {
-		UpdateGroup.class }) Long id, String propertyDescription, String emailGuest,
+		UpdateGroup.class }) Long id, String propertyDescription, String emailUser,
 		@JsonFormat(shape = Shape.STRING, pattern = BookingApiUtils.DATE_FORMAT) LocalDate startDate,
 		@JsonFormat(shape = Shape.STRING, pattern = BookingApiUtils.DATE_FORMAT) LocalDate endDate,
 		BookingStatus status, String details){

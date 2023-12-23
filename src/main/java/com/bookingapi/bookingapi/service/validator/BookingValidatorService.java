@@ -44,7 +44,7 @@ public class BookingValidatorService {
 
 	public void validateBookingMustBeCanceledToRebook(Booking booking) {
 		if (!BookingStatus.CANCELED.equals(booking.getStatus())) {
-			throw new BusinessException("The booking must be canceled perform this action");
+			throw new BusinessException("The booking must be canceled to perform this action");
 		}
 	}
 
@@ -89,7 +89,7 @@ public class BookingValidatorService {
 				isUserOwnerOfProperty);
 		if (!userConditionsToAllow.contains(Boolean.TRUE)) {
 			// Only the guest or property manager/owner can update a booking
-			throw new BusinessException("User not able to change this booking", HttpStatus.FORBIDDEN);
+			throw new BusinessException("User not able to modify this booking", HttpStatus.FORBIDDEN);
 		}
 	}
 
@@ -110,7 +110,7 @@ public class BookingValidatorService {
 		return managerAndOwnerIdsOfProperty.contains(user.getId());
 	}
 
-	private void validateBookingDates(LocalDate startDate, LocalDate endDate) {
+	public void validateBookingDates(LocalDate startDate, LocalDate endDate) {
 		if (startDate.isAfter(endDate)) {
 			throw new BusinessException("StartDate must be before EndDate");
 		}

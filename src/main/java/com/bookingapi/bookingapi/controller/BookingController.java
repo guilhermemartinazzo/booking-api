@@ -15,10 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bookingapi.bookingapi.group.CreateGroup;
 import com.bookingapi.bookingapi.group.UpdateGroup;
-import com.bookingapi.bookingapi.model.dto.requestbody.BookingDTO;
-import com.bookingapi.bookingapi.model.dto.requestbody.CancelBookingDTO;
 import com.bookingapi.bookingapi.model.dto.requestbody.CreateBookingDTO;
 import com.bookingapi.bookingapi.model.dto.requestbody.RebookingCanceledDTO;
+import com.bookingapi.bookingapi.model.dto.requestbody.UpdateBookingDTO;
 import com.bookingapi.bookingapi.model.dto.responsebody.BookingResponseDTO;
 import com.bookingapi.bookingapi.service.BookingService;
 
@@ -51,7 +50,7 @@ public class BookingController {
 	@PutMapping("/{id}")
 	@Operation(summary = "Updates an existing booking", method = "PUT")
 	public ResponseEntity<BookingResponseDTO> update(@PathVariable(name = "id") Long id,
-			@Validated(UpdateGroup.class) @RequestBody BookingDTO payload) {
+			@Validated(UpdateGroup.class) @RequestBody UpdateBookingDTO payload) {
 		BookingResponseDTO updatedBooking = service.update(id, payload);
 		return ResponseEntity.ok(updatedBooking);
 	}
@@ -78,18 +77,4 @@ public class BookingController {
 		return ResponseEntity.ok(service.cancelBooking(bookingId, userId));
 	}
 
-	/**
-	 * @PutMapping("/block/{id}")
-	 * 
-	 * @Operation(summary = "Update a block for a property", method = "PUT") public
-	 *                    ResponseEntity<Void> updateBlock(@PathVariable Long id) {
-	 *                    service.updateBlock(id); return
-	 *                    ResponseEntity.noContent().build(); }
-	 * 
-	 *                    @DeleteMapping("/block/{id}")
-	 * @Operation(summary = "Creates a block for a property", method = "DELETE")
-	 *                    public ResponseEntity<Void> deleteBlock(@PathVariable Long
-	 *                    id) { service.deleteBlock(id); return
-	 *                    ResponseEntity.noContent().build(); }
-	 */
 }

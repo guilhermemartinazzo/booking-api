@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 import com.bookingapi.bookingapi.enumerator.BookingStatus;
 import com.bookingapi.bookingapi.exception.BusinessException;
 import com.bookingapi.bookingapi.model.dto.requestbody.BlockDTO;
-import com.bookingapi.bookingapi.model.dto.requestbody.BookingDTO;
 import com.bookingapi.bookingapi.model.dto.requestbody.CreateBookingDTO;
 import com.bookingapi.bookingapi.model.dto.requestbody.RebookingCanceledDTO;
+import com.bookingapi.bookingapi.model.dto.requestbody.UpdateBookingDTO;
 import com.bookingapi.bookingapi.model.dto.responsebody.BookingResponseDTO;
 import com.bookingapi.bookingapi.model.entity.Booking;
 import com.bookingapi.bookingapi.model.entity.Property;
@@ -35,14 +35,7 @@ public class BookingService {
 		bookingValidator.validateBookingPersistence(null, bookingDTO.startDate(), bookingDTO.endDate(),
 				property.getId());
 		final Booking booking = buildBookingEntityFromDTO(bookingDTO, user, property);
-		repository.save(booking);
-		return buildBookingResponse(booking);
-
-	}
-
-	private Booking buildBookingEntityFromDTO(CreateBookingDTO bookingDTO, final User user, final Property property) {
-		return Booking.builder().startDate(bookingDTO.startDate()).endDate(bookingDTO.endDate())
-				.status(BookingStatus.ACTIVE).property(property).user(user).details(bookingDTO.details()).build();
+		return buildBookingResponse(repository.save(booking));
 	}
 
 	public void delete(Long id, Long userId) {
@@ -51,19 +44,19 @@ public class BookingService {
 		repository.delete(bookingToBeDeleted);
 	}
 
-	public BookingResponseDTO update(Long id, BookingDTO bookingDTO) {
+	public BookingResponseDTO update(Long id, UpdateBookingDTO bookingDTO) {
 		final Booking booking = findBookingById(id);
 		final User user = userService.findUserById(bookingDTO.userId());
-		final Property prop = propertyService.findById(bookingDTO.propertyId());
+		final Property prop = booking.getProperty();
 		bookingValidator.validateUserCanUpdateBooking(bookingDTO.userId(), booking);
-		bookingValidator.validateBookingStatusChangingToBlocked(bookingDTO.status(), booking);
 		bookingValidator.validateBookingPersistence(id, bookingDTO.startDate(), bookingDTO.endDate(), prop.getId());
-		return updateBooking(bookingDTO, booking, user, prop);
+		return updateBooking(bookingDTO, booking, user);
 	}
 
 	public BookingResponseDTO createBlock(BlockDTO blockDTO) {
 		final User user = userService.findUserById(blockDTO.userId());
 		final Property property = propertyService.findById(blockDTO.propertyId());
+		bookingValidator.validateBookingDates(blockDTO.startDate(), blockDTO.endDate());
 		bookingValidator.validateUserHasPermissionToBlock(user, property);
 		bookingValidator.validatePropertyHasActiveOrBlockedBookings(blockDTO);
 		bookingValidator.validatePropertyHasCanceledBookings(blockDTO);
@@ -122,13 +115,15 @@ public class BookingService {
 
 	}
 
-	private BookingResponseDTO updateBooking(BookingDTO bookingDTO, final Booking booking, final User user,
-			final Property prop) {
+	private Booking buildBookingEntityFromDTO(CreateBookingDTO bookingDTO, final User user, final Property property) {
+		return Booking.builder().startDate(bookingDTO.startDate()).endDate(bookingDTO.endDate())
+				.status(BookingStatus.ACTIVE).property(property).user(user).details(bookingDTO.details()).build();
+	}
+
+	private BookingResponseDTO updateBooking(UpdateBookingDTO bookingDTO, final Booking booking, final User user) {
 		booking.setUser(user);
-		booking.setProperty(prop);
 		booking.setStartDate(bookingDTO.startDate());
 		booking.setEndDate(bookingDTO.endDate());
-		booking.setStatus(bookingDTO.status());
 		booking.setDetails(bookingDTO.details());
 		return buildBookingResponse(repository.save(booking));
 	}
@@ -148,7 +143,7 @@ public class BookingService {
 
 	private BookingResponseDTO buildBookingResponse(Booking booking) {
 		return BookingResponseDTO.builder().id(booking.getId()).startDate(booking.getStartDate())
-				.endDate(booking.getEndDate()).emailGuest(booking.getUser().getEmail()).details(booking.getDetails())
+				.endDate(booking.getEndDate()).emailUser(booking.getUser().getEmail()).details(booking.getDetails())
 				.propertyDescription(booking.getProperty().getDescription()).status(booking.getStatus()).build();
 	}
 
