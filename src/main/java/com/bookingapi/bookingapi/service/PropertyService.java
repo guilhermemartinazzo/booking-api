@@ -29,8 +29,7 @@ public class PropertyService {
 		prop.setDescription(propertyDTO.description());
 		prop.setManager(manager);
 		prop.setOwner(owner);
-		Property propertyEntity = repository.save(prop);
-		return buildPropertyResponseDTO(propertyEntity);
+		return buildPropertyResponseDTO(repository.save(prop));
 	}
 
 	public List<PropertyResponseDTO> findAll() {

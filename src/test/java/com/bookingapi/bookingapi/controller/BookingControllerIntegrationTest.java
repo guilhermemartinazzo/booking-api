@@ -45,7 +45,6 @@ class BookingControllerIntegrationTest extends TestController {
 	private static final long ID_USER_OWNER = 3L;
 	private static final long ID_PROPERTY_1 = 1L;
 	private static final long ID_PROPERTY_2 = 2L;
-	private static final long ID_PROPERTY_3 = 3L;
 	private static final long ID_BOOKING_1 = 1L;
 	//
 

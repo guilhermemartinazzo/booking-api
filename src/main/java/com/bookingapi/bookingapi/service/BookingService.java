@@ -59,7 +59,7 @@ public class BookingService {
 		bookingValidator.validateBookingDates(blockDTO.startDate(), blockDTO.endDate());
 		bookingValidator.validateUserHasPermissionToBlock(user, property);
 		bookingValidator.validatePropertyHasActiveOrBlockedBookings(blockDTO);
-		bookingValidator.validatePropertyHasCanceledBookings(blockDTO);
+		bookingValidator.verifyPropertyHasCanceledBookings(blockDTO);
 		Booking block = buildBookingFromBlockDTO(blockDTO, user, property);
 		return buildBookingResponse(repository.save(block));
 
@@ -71,7 +71,7 @@ public class BookingService {
 		final User user = userService.findUserById(blockDTO.userId());
 		bookingValidator.validateUserHasPermissionToBlock(user, property);
 		bookingValidator.validatePropertyHasActiveOrBlockedBookings(blockDTO);
-		bookingValidator.validatePropertyHasCanceledBookings(blockDTO);
+		bookingValidator.verifyPropertyHasCanceledBookings(blockDTO);
 		booking.setDetails(blockDTO.details());
 		booking.setStartDate(blockDTO.startDate());
 		booking.setEndDate(blockDTO.endDate());
@@ -97,11 +97,10 @@ public class BookingService {
 
 	public BookingResponseDTO cancelBooking(Long bookingId, Long userId) {
 		Booking booking = findBookingById(bookingId);
-		bookingValidator.validateBookingIsAlreadyCanceled(booking);
 		bookingValidator.validateUserCanUpdateBooking(userId, booking);
+		bookingValidator.validateBookingIsAlreadyCanceled(booking);
 		booking.setStatus(BookingStatus.CANCELED);
-		repository.save(booking);
-		return buildBookingResponse(booking);
+		return buildBookingResponse(repository.save(booking));
 
 	}
 

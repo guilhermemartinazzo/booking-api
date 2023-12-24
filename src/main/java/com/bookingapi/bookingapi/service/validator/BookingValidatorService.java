@@ -22,11 +22,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BookingValidatorService {
 
+	static final String MSG_VALIDATE_BOOKING_IS_BLOCKED = "The booking must be with status Blocked to be deleted";
+	static final String MSG_VALIDATE_USER_CAN_UPDATE_BOOKING = "User not able to modify this booking";
+	static final String MSG_VALIDATE_PROPERTY_HAS_ACTIVE_OR_BLOCKED_BOOKINGS = "The property has active bookings or blocks between these dates";
+	static final String MSG_VALIDATE_USER_HAS_PERMISSION_TO_BLOCK = "This user is not able to modify a block for this property";
+	static final String MSG_VALIDATE_BOOKING_STATUS_CHANGING_TO_BLOCKED = "It's not possible to Block this booking";
+	static final String MSG_VALIDATE_BOOKING_MUST_BE_CANCELED_TO_REBOOK = "The booking must be canceled to perform this action";
+	static final String MSG_VALIDATE_BOOKING_IS_ALREADY_CANCELED = "The Booking is already canceled";
+	static final String MSG_VALIDATE_BLOCKS_FROM_PROPERTY = "Booking not available for this property in this date";
+	static final String MSG_VALIDATE_USER_INFORMED_IS_TYPE_GUEST = "Only users of type GUEST can request a booking";
+	static final String MSG_VALIDATE_BOOKING_DATES = "StartDate must be before EndDate";
+
 	private final BookingRepository bookingRepository;
 
 	public void validateUserInformedIsTypeGuest(User user) {
 		if (!UserType.GUEST.equals(user.getUserType())) {
-			throw new BusinessException("Only users of type GUEST can request a booking!");
+			throw new BusinessException(MSG_VALIDATE_USER_INFORMED_IS_TYPE_GUEST);
 		}
 	}
 
@@ -38,13 +49,13 @@ public class BookingValidatorService {
 
 	public void validateBookingIsAlreadyCanceled(Booking booking) {
 		if (BookingStatus.CANCELED.equals(booking.getStatus())) {
-			throw new BusinessException("The Booking is already canceled");
+			throw new BusinessException(MSG_VALIDATE_BOOKING_IS_ALREADY_CANCELED);
 		}
 	}
 
 	public void validateBookingMustBeCanceledToRebook(Booking booking) {
 		if (!BookingStatus.CANCELED.equals(booking.getStatus())) {
-			throw new BusinessException("The booking must be canceled to perform this action");
+			throw new BusinessException(MSG_VALIDATE_BOOKING_MUST_BE_CANCELED_TO_REBOOK);
 		}
 	}
 
@@ -52,14 +63,13 @@ public class BookingValidatorService {
 		boolean statusChanged = !bookingEntity.getStatus().equals(bookingStatus);
 		if (BookingStatus.BLOCKED.equals(bookingStatus) && statusChanged) {
 			// someone is trying to update a booking to status block
-			throw new BusinessException("It's not possible to Block this booking");
+			throw new BusinessException(MSG_VALIDATE_BOOKING_STATUS_CHANGING_TO_BLOCKED);
 		}
 	}
 
 	public void validateUserHasPermissionToBlock(User user, Property property) {
 		if (!verifyUserHasPermissionToBlock(property, user)) {
-			throw new BusinessException("This user is not able to create/update a block for this property",
-					HttpStatus.FORBIDDEN);
+			throw new BusinessException(MSG_VALIDATE_USER_HAS_PERMISSION_TO_BLOCK, HttpStatus.FORBIDDEN);
 		}
 	}
 
@@ -67,11 +77,11 @@ public class BookingValidatorService {
 		boolean hasActiveBookingsThatDates = !CollectionUtils.isEmpty(findBookingsFromPropertyBetweenDatesWithStatus(
 				blockDTO, List.of(BookingStatus.ACTIVE, BookingStatus.BLOCKED)));
 		if (hasActiveBookingsThatDates) {
-			throw new BusinessException("The property has active bookings or blocks between these dates");
+			throw new BusinessException(MSG_VALIDATE_PROPERTY_HAS_ACTIVE_OR_BLOCKED_BOOKINGS);
 		}
 	}
 
-	public void validatePropertyHasCanceledBookings(BlockDTO blockDTO) {
+	public void verifyPropertyHasCanceledBookings(BlockDTO blockDTO) {
 		List<Booking> canceledBookings = findBookingsFromPropertyBetweenDatesWithStatus(blockDTO,
 				List.of(BookingStatus.CANCELED));
 		boolean hasCanceledBookingsThoseDates = !CollectionUtils.isEmpty(canceledBookings);
@@ -89,13 +99,13 @@ public class BookingValidatorService {
 				isUserOwnerOfProperty);
 		if (!userConditionsToAllow.contains(Boolean.TRUE)) {
 			// Only the guest or property manager/owner can update a booking
-			throw new BusinessException("User not able to modify this booking", HttpStatus.FORBIDDEN);
+			throw new BusinessException(MSG_VALIDATE_USER_CAN_UPDATE_BOOKING, HttpStatus.FORBIDDEN);
 		}
 	}
 
 	public void validateBookingIsBlocked(Booking booking) {
 		if (!BookingStatus.BLOCKED.equals(booking.getStatus())) {
-			throw new BusinessException("The booking must be with status Blocked to be deleted");
+			throw new BusinessException(MSG_VALIDATE_BOOKING_IS_BLOCKED);
 		}
 	}
 
@@ -112,7 +122,7 @@ public class BookingValidatorService {
 
 	public void validateBookingDates(LocalDate startDate, LocalDate endDate) {
 		if (startDate.isAfter(endDate)) {
-			throw new BusinessException("StartDate must be before EndDate");
+			throw new BusinessException(MSG_VALIDATE_BOOKING_DATES);
 		}
 	}
 
@@ -120,7 +130,7 @@ public class BookingValidatorService {
 			throws BusinessException {
 		List<Booking> blocks = findBlocksFromPropertyBetweenDates(propertyId, startDate, endDate);
 		if (!CollectionUtils.isEmpty(blocks) && blocks.stream().noneMatch(block -> block.getId().equals(bookingId))) {
-			throw new BusinessException("Booking not available for this property in this date.");
+			throw new BusinessException(MSG_VALIDATE_BLOCKS_FROM_PROPERTY);
 		}
 	}
 
