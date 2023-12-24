@@ -15,7 +15,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 	List<Booking> findByPropertyIdAndStatus(@Param("propertyId") Long propertyId,
 			@Param("status") BookingStatus status);
 
-	@Query(value = "SELECT b FROM Booking b where b.property.id = :idProperty and b.status IN ('ACTIVE','BLOCK') and (b.startDate between :startDate and :endDate OR b.endDate between :startDate and :endDate)")
+	@Query(value = "SELECT b FROM Booking b where b.property.id = :idProperty and b.status IN ('ACTIVE','BLOCKED') and (b.startDate between :startDate and :endDate OR b.endDate between :startDate and :endDate)")
 	List<Booking> findBlocksFromPropertyBetweenDates(@Param("idProperty") Long idProperty,
 			@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 	
