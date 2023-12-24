@@ -46,7 +46,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 			WebRequest request) {
 		ExceptionResponseDTO exceptionResponse = new ExceptionResponseDTO(ex.getMessage(), LocalDateTime.now(),
 				request.getDescription(false));
-		return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(exceptionResponse, ex.getHttpStatus());
 	}
 	
 	@ExceptionHandler(EntityNotFoundException.class)

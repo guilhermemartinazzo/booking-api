@@ -91,33 +91,6 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			<!--			<plugin>-->
-			<!--				<groupId>org.openapitools</groupId>-->
-			<!--				<artifactId>openapi-generator-maven-plugin</artifactId>-->
-			<!--				<version>7.1.0</version>-->
-			<!--				<executions>-->
-			<!--					<execution>-->
-			<!--						<goals>-->
-			<!--							<goal>generate</goal>-->
-			<!--						</goals>-->
-			<!--						<configuration>-->
-			<!--							<inputSpec>-->
-			<!--								${project.basedir}/src/main/resources/swagger.yaml-->
-			<!--							</inputSpec>-->
-			<!--							<generatorName>spring</generatorName>-->
-			<!--							<apiPackage>com.bookingapi.bookingapi</apiPackage>-->
-			<!--							<modelPackage>com.bookingapi.bookingapi.model.dto</modelPackage>-->
-			<!--							<supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>-->
-			<!--							<configOptions>-->
-			<!--								<sourceFolder>src/main/java</sourceFolder>-->
-			<!--								<delegatePattern>true</delegatePattern>-->
-			<!--								<interfaceOnly>true</interfaceOnly>-->
-			<!--								<useJakartaEe>true</useJakartaEe>-->
-			<!--							</configOptions>-->
-			<!--						</configuration>-->
-			<!--					</execution>-->
-			<!--				</executions>-->
-			<!--			</plugin>-->
 		</plugins>
 	</build>
 

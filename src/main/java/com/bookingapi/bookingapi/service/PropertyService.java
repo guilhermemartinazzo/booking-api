@@ -23,15 +23,13 @@ public class PropertyService {
 	private final UserService userService;
 
 	public PropertyResponseDTO create(PropertyDTO propertyDTO) {
-		propertyDTO.description();
 		User manager = userService.findUserById(propertyDTO.managerId());
 		User owner = userService.findUserById(propertyDTO.ownerId());
 		Property prop = new Property();
 		prop.setDescription(propertyDTO.description());
 		prop.setManager(manager);
 		prop.setOwner(owner);
-		Property propertyEntity = repository.save(prop);
-		return buildPropertyResponseDTO(propertyEntity);
+		return buildPropertyResponseDTO(repository.save(prop));
 	}
 
 	public List<PropertyResponseDTO> findAll() {

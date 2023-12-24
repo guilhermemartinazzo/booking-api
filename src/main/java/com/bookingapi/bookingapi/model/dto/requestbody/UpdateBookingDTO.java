@@ -16,9 +16,12 @@ import lombok.Builder;
 
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record BlockDTO(@NotNull Long propertyId,
+public record UpdateBookingDTO(
 		@NotNull @JsonFormat(shape = Shape.STRING, pattern = BookingApiUtils.DATE_FORMAT) @FutureOrPresent(groups = CreateGroup.class) LocalDate startDate,
-		@NotNull @JsonFormat(shape = Shape.STRING, pattern = BookingApiUtils.DATE_FORMAT) @Future(groups = CreateGroup.class) LocalDate endDate,
-		@NotNull Long userId, String details) {
 
+		@NotNull @JsonFormat(shape = Shape.STRING, pattern = BookingApiUtils.DATE_FORMAT) @Future(groups = CreateGroup.class) LocalDate endDate,
+
+		@NotNull Long userId,
+
+		String details) {
 }

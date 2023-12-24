@@ -25,8 +25,7 @@ public class UserService {
 
 	public UserResponseDTO createUser(UserDTO user) {
 		User userEntity = User.builder().email(user.email()).userType(user.userType()).build();
-		repository.save(userEntity);
-		return buildUserResponseDTO(userEntity);
+		return buildUserResponseDTO(repository.save(userEntity));
 	}
 
 	private UserResponseDTO buildUserResponseDTO(User userEntity) {
@@ -36,5 +35,9 @@ public class UserService {
 
 	public User findUserById(Long id) {
 		return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
+	}
+
+	public UserResponseDTO findUserDTOById(Long id) {
+		return buildUserResponseDTO(findUserById(id));
 	}
 }

@@ -40,13 +40,17 @@ public class Booking {
 	@Column(nullable = false)
 	private LocalDate endDate;
 
-	@ManyToOne
+	@ManyToOne(optional = false)
 	private Property property;
 
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private BookingStatus status;
 
-	@ManyToOne
+	@ManyToOne(optional = false)
 	private User user;
+	
+	@Column
+	private String details;
 
 }

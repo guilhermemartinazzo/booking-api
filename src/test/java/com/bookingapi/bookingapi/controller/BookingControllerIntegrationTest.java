@@ -20,23 +20,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
 import com.bookingapi.bookingapi.enumerator.BookingStatus;
-import com.bookingapi.bookingapi.enumerator.UserType;
 import com.bookingapi.bookingapi.model.dto.requestbody.BlockDTO;
-import com.bookingapi.bookingapi.model.dto.requestbody.BookingDTO;
-import com.bookingapi.bookingapi.model.dto.requestbody.CancelBookingDTO;
-import com.bookingapi.bookingapi.model.dto.requestbody.PropertyDTO;
-import com.bookingapi.bookingapi.model.dto.requestbody.UserDTO;
+import com.bookingapi.bookingapi.model.dto.requestbody.CreateBookingDTO;
 import com.bookingapi.bookingapi.model.dto.responsebody.BookingResponseDTO;
 import com.bookingapi.bookingapi.model.dto.responsebody.ExceptionResponseDTO;
-import com.bookingapi.bookingapi.model.dto.responsebody.PropertyResponseDTO;
-import com.bookingapi.bookingapi.model.dto.responsebody.UserResponseDTO;
-import com.bookingapi.bookingapi.model.entity.Booking;
-import com.bookingapi.bookingapi.repository.BookingRepository;
-import com.bookingapi.bookingapi.repository.PropertyRepository;
-import com.bookingapi.bookingapi.repository.UserRepository;
 import com.bookingapi.bookingapi.service.BookingService;
-import com.bookingapi.bookingapi.service.PropertyService;
-import com.bookingapi.bookingapi.service.UserService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -44,22 +32,7 @@ import jakarta.persistence.EntityNotFoundException;
 class BookingControllerIntegrationTest extends TestController {
 
 	@Autowired
-	private UserService userService;
-
-	@Autowired
-	private PropertyService propertyService;
-
-	@Autowired
 	private BookingService bookingService;
-
-	@Autowired
-	private PropertyRepository propertyRepository;
-
-	@Autowired
-	private BookingRepository bookingRepository;
-
-	@Autowired
-	private UserRepository userRepository;
 
 	/**
 	 * On initialization (resources > data.sql) we have this scenario: 3 users (id:
@@ -72,7 +45,6 @@ class BookingControllerIntegrationTest extends TestController {
 	private static final long ID_USER_OWNER = 3L;
 	private static final long ID_PROPERTY_1 = 1L;
 	private static final long ID_PROPERTY_2 = 2L;
-	private static final long ID_PROPERTY_3 = 3L;
 	private static final long ID_BOOKING_1 = 1L;
 	//
 
@@ -96,7 +68,7 @@ class BookingControllerIntegrationTest extends TestController {
 	void testCreateBlockWhenThereIsCanceledBooking_Status_OK() throws Exception {
 
 		// Preparing
-		bookingService.cancelBooking(CancelBookingDTO.builder().userId(ID_USER_GUEST).bookingId(ID_BOOKING_1).build());
+		bookingService.cancelBooking(ID_USER_GUEST, ID_BOOKING_1);
 		BlockDTO blockPayload = BlockDTO.builder().propertyId(ID_PROPERTY_1).startDate(LocalDate.of(2099, 12, 1))
 				.endDate(LocalDate.of(2099, 12, 4)).userId(ID_USER_MANAGER).build();
 		String jsonPayload = objMapper.writeValueAsString(blockPayload);
@@ -123,7 +95,7 @@ class BookingControllerIntegrationTest extends TestController {
 		String jsonPayload = objMapper.writeValueAsString(blockPayload);
 		// Executing and Validating
 		mockMvc.perform(post("/v1/booking/block").contentType(MediaType.APPLICATION_JSON_VALUE).content(jsonPayload))
-				.andExpect(status().isBadRequest()).andReturn();
+				.andExpect(status().isForbidden()).andReturn();
 
 	}
 
@@ -153,7 +125,7 @@ class BookingControllerIntegrationTest extends TestController {
 	void testUserGuestCreateBooking_Status_OK() throws Exception {
 
 		// Preparing
-		BookingDTO bookingPayload = BookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
 				.endDate(LocalDate.of(2099, 12, 9)).userId(ID_USER_GUEST).build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating
@@ -173,7 +145,7 @@ class BookingControllerIntegrationTest extends TestController {
 	void testUserManagerCreateBooking_Status_BAD_REQUEST() throws Exception {
 
 		// Preparing
-		BookingDTO bookingPayload = BookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
 				.endDate(LocalDate.of(2099, 12, 9)).userId(ID_USER_MANAGER).build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating
@@ -187,7 +159,7 @@ class BookingControllerIntegrationTest extends TestController {
 	void testUserOwnerCreateBooking_Status_BAD_REQUEST() throws Exception {
 
 		// Preparing
-		BookingDTO bookingPayload = BookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().propertyId(ID_PROPERTY_2).startDate(LocalDate.of(2099, 12, 8))
 				.endDate(LocalDate.of(2099, 12, 9)).userId(ID_USER_OWNER).build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating
@@ -201,7 +173,7 @@ class BookingControllerIntegrationTest extends TestController {
 	void testUserGuestCreateBooking_Status_BAD_REQUEST() throws Exception {
 
 		// Preparing
-		BookingDTO bookingPayload = BookingDTO.builder().propertyId(ID_PROPERTY_2)
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().propertyId(ID_PROPERTY_2)
 				.startDate(LocalDate.now().minusDays(1)).endDate(LocalDate.now()).userId(ID_USER_GUEST).build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating
@@ -215,7 +187,7 @@ class BookingControllerIntegrationTest extends TestController {
 	void testUserGuestCreateBookingNoRequiredFields_Status_BAD_REQUEST() throws Exception {
 
 		// Preparing
-		BookingDTO bookingPayload = BookingDTO.builder().build();
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating
 		MvcResult result = mockMvc
@@ -228,64 +200,32 @@ class BookingControllerIntegrationTest extends TestController {
 		assertThat(message).contains("startDate").contains("endDate").contains("propertyId").contains("userId");
 	}
 
-	@Order(90)
+	@Order(100)
 	@Test
 	@DisplayName("Guest creates a booking and then update dates on property 2")
 	void testUserGuestUpdatesBooking_Status_OK() throws Exception {
 
 		// Preparing
-		BookingResponseDTO bookingCreatedProperty2 = bookingService.createBooking(
-				BookingDTO.builder().startDate(LocalDate.of(2098, 10, 01)).endDate(LocalDate.of(2098, 10, 02))
-				.propertyId(ID_PROPERTY_2)
-				.userId(ID_USER_GUEST).build()
-				);
-		BookingDTO bookingPayload = BookingDTO.builder()
-				.startDate(LocalDate.of(2098,12,01)).endDate(LocalDate.of(2098, 12, 02))
-				.propertyId(ID_PROPERTY_2)
-				.status(BookingStatus.ACTIVE)
-				.userId(ID_USER_GUEST).id(bookingCreatedProperty2.id()).build();
+		BookingResponseDTO bookingCreatedProperty2 = bookingService
+				.createBooking(CreateBookingDTO.builder().startDate(LocalDate.of(2098, 10, 01))
+						.endDate(LocalDate.of(2098, 10, 02)).propertyId(ID_PROPERTY_2).userId(ID_USER_GUEST).build());
+		CreateBookingDTO bookingPayload = CreateBookingDTO.builder().startDate(LocalDate.of(2098, 12, 01))
+				.endDate(LocalDate.of(2098, 12, 02)).propertyId(ID_PROPERTY_2)
+				.userId(ID_USER_GUEST).build();
 		String jsonPayload = objMapper.writeValueAsString(bookingPayload);
 		// Executing and Validating
-		MvcResult result = mockMvc.perform(put("/v1/booking/{id}", bookingCreatedProperty2.id()).contentType(MediaType.APPLICATION_JSON_VALUE).content(jsonPayload))
+		MvcResult result = mockMvc
+				.perform(put("/v1/booking/{id}", bookingCreatedProperty2.id())
+						.contentType(MediaType.APPLICATION_JSON_VALUE).content(jsonPayload))
 				.andExpect(status().isOk()).andReturn();
-		
+
 		BookingResponseDTO responseObtained = objMapper.readValue(result.getResponse().getContentAsString(),
 				BookingResponseDTO.class);
-		assertThat(responseObtained)
-		.hasFieldOrPropertyWithValue("startDate", bookingPayload.startDate())
-		.hasFieldOrPropertyWithValue("endDate", bookingPayload.endDate())
-		.hasFieldOrPropertyWithValue("status", BookingStatus.ACTIVE)
-		.hasFieldOrPropertyWithValue("id", bookingPayload.id())
-		;
-		bookingService.delete(bookingCreatedProperty2.id());
-	}
-
-	private PropertyResponseDTO createProperty(UserResponseDTO managerCreated, UserResponseDTO ownerCreated) {
-		PropertyResponseDTO propertyCreated = propertyService.create(PropertyDTO.builder().description("Property Test")
-				.managerId(managerCreated.id()).ownerId(ownerCreated.id()).build());
-		return propertyCreated;
-	}
-
-	private BookingResponseDTO createBooking(Long propertyId, Long userId, LocalDate startDate, LocalDate endDate) {
-		BookingDTO build = BookingDTO.builder().startDate(startDate).endDate(endDate).propertyId(propertyId)
-				.userId(userId).build();
-		return bookingService.createBooking(build);
-	}
-
-	private UserResponseDTO createUser(UserDTO userDTO) {
-		return userService.createUser(userDTO);
-	}
-
-	private UserDTO buildOwner() {
-		return UserDTO.builder().email("emailOwner@teste.com").userType(UserType.OWNER).build();
-	}
-
-	private UserDTO buildManager() {
-		return UserDTO.builder().email("emailManager@teste.com").userType(UserType.MANAGER).build();
-	}
-
-	private UserDTO buildGuest() {
-		return UserDTO.builder().email("emailguest@teste.com").userType(UserType.GUEST).build();
+		assertThat(responseObtained).hasFieldOrPropertyWithValue("startDate", bookingPayload.startDate())
+				.hasFieldOrPropertyWithValue("endDate", bookingPayload.endDate())
+				.hasFieldOrPropertyWithValue("status", BookingStatus.ACTIVE)
+				.hasFieldOrPropertyWithValue("id", bookingCreatedProperty2.id());
+		bookingService.delete(bookingCreatedProperty2.id(), ID_USER_GUEST);
 	}
 
 }
